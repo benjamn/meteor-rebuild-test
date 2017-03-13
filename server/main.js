@@ -1,11 +1,14 @@
 import { Meteor } from 'meteor/meteor';
 import bcrypt from "bcrypt";
 
-const salt = Promise.denodeify(bcrypt.genSalt)(10);
-const hash = Promise.denodeify(bcrypt.hash);
-
 Meteor.methods({
   computeHash(str) {
-    return hash(str, salt.await()).await();
+    return new Promise(resolve => {
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(str, salt, (err, hash) => {
+          resolve("oyez: " + hash);
+        });
+      });
+    });
   }
 });
